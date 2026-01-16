@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagitan Spellbook</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    // Error Handler to help debug
+    window.onerror = function(msg, url, line) {
+      console.error("App Error: " + msg + "\nLine: " + line);
+    };
+
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: "#FDF8E8", 
+            panel: "#FFFFFF",
+            accent: "#0ea5e9", 
+            dark: "#1e293b",
+            muted: "#64748b",
+            danger: "#ef4444",
+            success: "#22c55e",
+            gold: "#eab308"
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+      .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+      
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+      input[type=number] { -moz-appearance: textfield; }
+      
+      .slot-bubble {
+        width: 1.75rem; height: 1.75rem;
+        border-radius: 9999px;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .slot-bubble.available { background-color: #0ea5e9; border-color: #0ea5e9; box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3); }
+      .slot-bubble.used { background-color: transparent; border-color: #cbd5e1; }
+      .slot-bubble:hover { transform: scale(1.1); }
+
+      .tab-btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 0.875rem;
+        color: #64748b;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s;
+      }
+      .tab-btn.active { color: #0ea5e9; border-bottom-color: #0ea5e9; }
+      .tab-btn:hover:not(.active) { color: #1e293b; border-bottom-color: #cbd5e1; }
+
+      .spell-checkbox {
+        accent-color: #0ea5e9;
+        width: 1.25rem;
+        height: 1.25rem;
+        cursor: pointer;
+      }
+  </style>
+</head>
+
+<body class="bg-surface text-dark min-h-screen font-sans selection:bg-accent selection:text-white pb-20">
+
+  <main class="max-w-4xl mx-auto px-4 py-8 space-y-8">
+
+    <header class="text-center space-y-2">
+      <h1 class="text-4xl font-extrabold tracking-tight text-dark uppercase">
+        Class Guide <span class="text-accent">Spellbook</span>
+      </h1>
+      <p class="text-muted font-medium">5th Edition Reference & Tracker</p>
+    </header>
+
+    <section class="bg-white rounded-2xl p-6 shadow-sm border border-stone-200 space-y-6">
+      
+      <div class="space-y-3">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-muted text-center">1. Select Class</h2>
+        <div id="classButtons" class="grid grid-cols-2 md:grid-cols-3 gap-3"></div>
+      </div>
+
+      <div id="subclassSection" class="hidden space-y-3 pt-4 border-t border-stone-100 animate-fade-in">
+        <h2 id="subclassTitle" class="text-xs font-bold uppercase tracking-widest text-accent text-center">Select Origin</h2>
+        <div id="subclassButtons" class="flex flex-wrap justify-center gap-2"></div>
+      </div>
+
+      <div class="space-y-3 pt-4 border-t border-stone-100">
+        <h2 class="text-xs font-bold uppercase tracking-widest text-muted text-center">2. Character Stats</h2>
+        
+        <div class="flex flex-wrap items-center justify-center gap-6">
+          
+          <div class="flex flex-col items-center gap-1">
+            <span class="text-[10px] font-bold text-muted uppercase">Level</span>
+            <div class="flex items-center bg-stone-50 rounded-lg p-1 border border-stone-200 shadow-inner">
+              <button id="btnMinus" class="w-12 h-12 flex items-center justify-center text-muted hover:text-accent hover:bg-white rounded-md transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+              <input type="number" id="levelInput" value="1" min="1" max="20" class="w-16 text-center font-bold text-3xl text-dark bg-transparent outline-none focus:ring-0 cursor-text p-0" />
+              <button id="btnPlus" class="w-12 h-12 flex items-center justify-center text-muted hover:text-accent hover:bg-white rounded-md transition"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+            </div>
+          </div>
+
+          <div class="flex flex-col items-center gap-1">
+            <span class="text-[10px] font-bold text-muted uppercase">Ability Mod</span>
+            <div class="flex items-center bg-stone-50 rounded-lg p-1 border border-stone-200 shadow-inner h-[58px]">
+               <input type="number" id="modInput" value="3" min="-1" max="10" class="w-16 text-center font-bold text-xl text-accent bg-transparent outline-none focus:ring-0 cursor-text p-0" />
+            </div>
+          </div>
+
+        </div>
+        
+        <div class="text-center pt-2">
+           <div id="milestoneDisplay" class="text-xs font-bold text-stone-400 mb-1"></div>
+           <div id="spellsKnownDisplay" class="text-xs text-stone-500 font-medium inline-block bg-stone-50 px-3 py-1 rounded-full border border-stone-100"></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="appTabs" class="hidden"> 
+      <nav class="flex justify-center border-b-2 border-stone-100 mb-6">
+        <button id="tabSpellbook" class="tab-btn active" onclick="switchTab('spellbook')">📖 Reference</button>
+        <button id="tabTracker" class="tab-btn" onclick="switchTab('tracker')">⚡ Slot Tracker</button>
+      </nav>
+
+      <div id="view-spellbook" class="space-y-6 animate-fade-in">
+        <div class="text-center text-sm text-stone-400 italic">
+          Viewing full class spell list. Go to <strong>Slot Tracker</strong> to prepare spells.
+        </div>
+        <div class="space-y-2">
+          <div id="filterContainer1" class="flex flex-wrap gap-2 justify-center"></div>
+        </div>
+        <div id="list-spellbook" class="grid grid-cols-1 gap-4"></div>
+      </div>
+
+      <div id="view-tracker" class="hidden space-y-8 animate-fade-in">
+        
+        <div class="bg-white rounded-xl p-5 shadow-sm border border-accent/20">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-dark flex items-center gap-2">
+              <span class="bg-accent text-white p-1 rounded">⚡</span> Spell Slots
+            </h2>
+            <button id="btnRest" class="text-xs font-bold uppercase tracking-wide text-white bg-dark px-4 py-2 rounded-lg hover:bg-accent transition shadow-sm">
+              Long Rest 🌙
+            </button>
+          </div>
+          <div id="slotTracker" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+
+        <div class="space-y-4">
+          <h2 class="text-xs font-bold uppercase tracking-widest text-muted border-b border-stone-200 pb-2">Ready to Cast</h2>
+          <div id="list-tracker" class="grid grid-cols-1 gap-4"></div>
+          <div id="emptyTrackerMsg" class="hidden text-center py-8 text-stone-400 bg-stone-50 rounded-xl border border-dashed border-stone-200">
+            <p class="text-sm">No spells prepared.</p>
+            <p class="text-xs mt-1">Select spells below to add them to your list.</p>
+          </div>
+        </div>
+
+        <div class="space-y-4 pt-4 border-t-2 border-stone-100">
+          <div class="flex items-center justify-between">
+             <h2 class="text-xs font-bold uppercase tracking-widest text-accent">Prepare / Learn Spells</h2>
+             <span id="limitDisplay" class="text-xs font-bold bg-stone-100 text-stone-600 px-2 py-1 rounded">0/0 Selected</span>
+          </div>
+          
+          <div class="bg-stone-50 rounded-xl p-4 border border-stone-200 max-h-[500px] overflow-y-auto">
+             <div class="space-y-2 mb-4">
+                <div id="filterContainer2" class="flex flex-wrap gap-2"></div>
+             </div>
+             <div id="list-selection" class="grid grid-cols-1 gap-3"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <script src="./spells.js"></script>
+  <script src="./main.js"></script>
+</body>
+</html>
